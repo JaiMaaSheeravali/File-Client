@@ -5,11 +5,11 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-#include "./include/upload.hpp"
-#include "./include/download.hpp"
-#include "./include/list.hpp"
-#include "./include/rename.hpp"
-#include "./include/delete.hpp"
+#include "../include/upload.hpp"
+#include "../include/download.hpp"
+#include "../include/list.hpp"
+#include "../include/rename.hpp"
+#include "../include/delete.hpp"
 
 using namespace std;
 #define PORT 2400
