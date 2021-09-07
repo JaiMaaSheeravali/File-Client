@@ -15,7 +15,7 @@ set(CMAKE_CXX_STANDARD 17)
 include_directories(include)
 
 # puts all .cpp files inside src to the SOURCES variable
-file(GLOB SOURCES *.c*)
+file(GLOB SOURCES src/*.c*)
 
 # compiles the files defined by SOURCES to generante the executable defined by EXEC
 add_executable(${EXEC} ${SOURCES})
