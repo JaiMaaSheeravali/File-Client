@@ -4,72 +4,30 @@
 #include <string>
 #include <sys/socket.h>
 
+#include "../include/request.hpp"
+
 using namespace std;
 
-int senddata(int socket_desc, const char *buffer, const int size){
+int Request::get_file(){
+    string filename;
 
-    if(send(socket_desc, &size, sizeof(int), 0) < 0){
-        cout << "Unable to send message size\n";
-        return -1;
-    }
-    if(send(socket_desc, buffer, size, 0) < 0){
-        cout << "Unable to send message content\n";
-        return -1;
-    }
-    return 0;
-}
+    cout << "Enter filename to fetch from server: ";
+    cin >> filename;
+    send_data(filename.c_str(), filename.size());
 
-int recv_data(int socket_desc, const char* filename){
-    int file_size = 0;
-
-    if (recv(socket_desc, &file_size, sizeof(int), 0) < 0){
-        cout << "Couldn't receive\n";
-        return 0;
-    }
-    cout << "Size of file: " << file_size << "\n";
-
-    char buffer[file_size];
-
-    if(recv(socket_desc, buffer, file_size, 0) < 0){
-        cout << "Couldn't receive\n";
-        return 0;
-    }
-    ofstream file(filename, ios::out|ios::binary);
-    file.write(buffer, file_size);
-
-    return file_size;
-}
-
-
-char* recv_string(int socket_desc){
-    int file_size = 0;
-
-    if (recv(socket_desc, &file_size, sizeof(int), 0) < 0){
-        cout << "Couldn't receive\n";
-    }
-    cout << "Size of file: " << file_size << "\n";
-
-    char *buffer = new char[file_size];
-
-    if(recv(socket_desc, buffer, file_size, 0) < 0){
-        cout << "Couldn't receive\n";
-        return buffer;
-    }
-    return buffer;
-}
-
-int getfile(int socket_desc, string &filename){
-
-    senddata(socket_desc, filename.c_str(), filename.size());
-
-    recv_data(socket_desc, filename.c_str());
+    recv_data(filename.c_str());
 
     return 0;
 }
 
-int sendfile(int socket_desc, string &filename){
+int Request::send_file(){
+    string filename;
 
-    senddata(socket_desc, filename.c_str(), filename.size());
+    // Get input from the user:
+    cout << "Enter filename to upload: ";
+    cin >> filename;
+
+    send_data(filename.c_str(), filename.size());
 
     //open file in binary mode, get pointer at the end of the file (ios::ate)
     ifstream file (filename, ios::in|ios::binary|ios::ate); 
@@ -83,7 +41,7 @@ int sendfile(int socket_desc, string &filename){
     file.read (buffer, file_size);                                   
     file.close();                                               
 
-    senddata(socket_desc, buffer, file_size);
+    send_data(buffer, file_size);
     
     return 0;
 }
