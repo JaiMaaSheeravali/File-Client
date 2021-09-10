@@ -5,6 +5,7 @@
 #include <sys/socket.h>
 
 #include "../include/request.hpp"
+#include "../include/color.hpp"
 
 using namespace std;
 
@@ -13,11 +14,11 @@ void Request::handle_request(){
     while(true){
         char command[200];
         memset(command, '\0', sizeof(command));
-        cout << "Enter Command(upload | download | list | delete | rename | exit): ";
+        cout << CYAN << "Enter Command(upload | download | list | delete | rename | exit): " << RESET;
         cin >> command;
 
         if(send(socket_desc, command, sizeof(command), 0) < 0){
-            cout << "Unable to send command\n";
+            cout << RED << "Unable to send command\n" << RESET;
             return;
         }
 
@@ -42,7 +43,7 @@ void Request::handle_request(){
             
             break;
         } else {
-            cout << "Invalid Command" << endl;
+            cout << RED << "Invalid Command" << RESET << endl;
         }
     }
 

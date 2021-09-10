@@ -5,17 +5,18 @@
 #include <sys/socket.h>
 
 #include "../include/request.hpp"
+#include "../include/color.hpp"
 
 using namespace std;
 
 int Request::send_data(const char *buffer, const int size){
 
     if(send(socket_desc, &size, sizeof(int), 0) < 0){
-        cout << "Unable to send message size\n";
+        cerr << RED << "Unable to send message size\n" << RESET;
         return -1;
     }
     if(send(socket_desc, buffer, size, 0) < 0){
-        cout << "Unable to send message content\n";
+        cerr << RED << "Unable to send message content\n" << RESET;
         return -1;
     }
     return 0;
@@ -25,15 +26,14 @@ int Request::recv_data(const char* filename){
     int file_size = 0;
 
     if (recv(socket_desc, &file_size, sizeof(int), 0) < 0){
-        cout << "Couldn't receive\n";
+        cerr << RED << "Couldn't receive\n" << RESET;
         return 0;
     }
-    cout << "Size of file: " << file_size << "\n";
 
     char buffer[file_size];
 
     if(recv(socket_desc, buffer, file_size, 0) < 0){
-        cout << "Couldn't receive\n";
+        cerr << RED << "Couldn't receive\n" << RESET;
         return 0;
     }
     ofstream file(filename, ios::out|ios::binary);
@@ -47,15 +47,14 @@ char* Request::recv_string(){
     int file_size = 0;
 
     if (recv(socket_desc, &file_size, sizeof(int), 0) < 0){
-        cout << "Couldn't receive\n";
+        cerr << RED << "Couldn't receive\n" << RESET;
     }
-    cout << "Size of file: " << file_size << "\n";
 
     char *buffer = new char[file_size+1];
     buffer[file_size] = '\0';
 
     if(recv(socket_desc, buffer, file_size, 0) < 0){
-        cout << "Couldn't receive\n";
+        cerr << RED << "Couldn't receive\n" << RESET;
         return buffer;
     }
     return buffer;

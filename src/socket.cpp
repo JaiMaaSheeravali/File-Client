@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 
 #include "../include/request.hpp"
+#include "../include/color.hpp"
 
 using namespace std;
 #define PORT 2400
@@ -20,11 +21,11 @@ int connect(){
     socket_desc = socket(AF_INET, SOCK_STREAM, 0);
     
     if(socket_desc < 0){
-        cout << "Unable to create socket\n";
+        cout << RED << "Unable to create socket\n" << RESET;
         return -1;
     }
     
-    cout << "Socket created successfully\n";
+    cout << GREEN << "Socket created successfully\n" << RESET;
     
     // Set port and IP the same as server-side:
     server_addr.sin_family = AF_INET;
@@ -33,10 +34,10 @@ int connect(){
     
     // Send connection request to server:
     if(connect(socket_desc, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0){
-        cout << "Unable to connect\n";
+        cout << RED << "Unable to connect\n" << RESET;
         return -1;
     }
-    cout << "Connected with server successfully\n";
+    cout << GREEN << "Connected with server successfully\n" << RESET;
     
     Request request = Request(socket_desc);
 
