@@ -4,14 +4,14 @@
 
 
 # Configuration directories and files
-SourceDirectory: /mnt/c/Users/jnama/project/client
-BuildDirectory: /mnt/c/Users/jnama/project/client
+SourceDirectory: /home/prakhar/Projects/Networking_Project/File-Client
+BuildDirectory: /home/prakhar/Projects/Networking_Project/File-Client
 
 # Where to place the cost data store
 CostDataFile: 
 
 # Site is something like machine.domain, i.e. pragmatic.crd
-Site: LAPTOP-34CLVC3I
+Site: prakhar-Lenovo-Legion-5-15ARH05
 
 # Build name is osname-revision-compiler, i.e. Linux-2.4.2-2smp-c++
 BuildName: Linux-c++
@@ -26,7 +26,7 @@ SubmitURL: http://
 NightlyStartTime: 00:00:00 EDT
 
 # Commands for the build/test/submit cycle
-ConfigureCommand: "/usr/bin/cmake" "/mnt/c/Users/jnama/project/client"
+ConfigureCommand: "/usr/bin/cmake" "/home/prakhar/Projects/Networking_Project/File-Client"
 MakeCommand: /usr/bin/cmake --build . --config "${CTEST_CONFIGURATION_TYPE}" -- -i
 DefaultCTestConfigurationType: Release
 
