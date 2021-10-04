@@ -34,11 +34,11 @@ void Request::handle_request(){
         if(command == "login"){
             // get login information and check it
 
-            break;
+            //break;
         } else if(command == "register"){
             // register the user and get information
 
-            break;
+            //break;
         } else if(command == "exit"){
             return;
 
