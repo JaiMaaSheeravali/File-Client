@@ -17,8 +17,25 @@ int Request::rename_file(){
     cout << CYAN << "Enter updated name of file: " << RESET;
     cin >> new_filename;
 
-    send_data(original_filename.c_str(), original_filename.size());
-    send_data(new_filename.c_str(), new_filename.size());
+    //send_data(original_filename.c_str(), original_filename.size());
+    //send_data(new_filename.c_str(), new_filename.size());
+
+    ftpRequest += "rename ";
+
+    if(isGlobal){
+        ftpRequest += "-g ";
+    }
+
+    ftpRequest += original_filename + " " + new_filename + "\n";
+    ftpRequest += transferEndFlag;
+
+    buffer = new char[ftpRequest.size()+1];
+    buffer[ftpRequest.size()] = '\0';
+    strcpy(buffer, ftpRequest.c_str());
+
+    bytes_left = ftpRequest.size()+1;
+
+    sendDataToServer();
 
     cout << GREEN << "Successfully renamed '" << original_filename << "' to '" << new_filename << "'.\n" << RESET;
     
@@ -32,15 +49,51 @@ int Request::delete_file(){
     cout << CYAN << "Enter filename to delete: " << RESET;
     cin >> filename;
 
-    send_data(filename.c_str(), filename.size());
+    //send_data(filename.c_str(), filename.size());
+
+    ftpRequest += "delete ";
+
+    if(isGlobal){
+        ftpRequest += "-g ";
+    }
+
+    ftpRequest += filename + "\n";
+    ftpRequest += transferEndFlag;
+
+    buffer = new char[ftpRequest.size()+1];
+    buffer[ftpRequest.size()] = '\0';
+    strcpy(buffer, ftpRequest.c_str());
+
+    bytes_left = ftpRequest.size()+1;
+
+    sendDataToServer();
 
     cout << GREEN << "Successfully deleted '" << filename << "' from Server.\n" << RESET;
     return 0;
 }
 
 int Request::get_file_list(){
+
+    ftpRequest += "list";
+    if(isGlobal)
+        ftpRequest += " -g";
+
+    ftpRequest += "\n" + transferEndFlag;
+
+    buffer = new char[ftpRequest.size()+1];
+    buffer[ftpRequest.size()] = '\0';
+    strcpy(buffer, ftpRequest.c_str());
+
+    bytes_left = ftpRequest.size()+1;
+
+    sendDataToServer();
+
+    char* fileList = recvDataFromServer();
+
     cout << YELLOW;
-    cout << recv_string() << endl;
+    cout << fileList << endl;
     cout << RESET;
+
+    delete[] fileList;
     return 0;
 }
