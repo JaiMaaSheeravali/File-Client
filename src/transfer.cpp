@@ -3,6 +3,7 @@
 #include <cstring>
 #include <string>
 #include <sys/socket.h>
+#include <unistd.h>
 
 #include "../include/request.hpp"
 #include "../include/color.hpp"
@@ -52,6 +53,11 @@ int Request::send_file(){
     cout << CYAN << "Enter filename to upload: " << RESET;
     cin >> filename;
 
+    if(access(filename.c_str(), F_OK ) == -1){
+        cout << RED << "Error! " << filename << " doesn't exist in current working directory!\n" << RESET;
+        return -1;
+    }
+
     //open file in binary mode, get pointer at the end of the file (ios::ate)
     std::ifstream file(filename, std::ios::in|std::ios::ate); 
 
@@ -71,15 +77,9 @@ int Request::send_file(){
 
     strcpy(buffer, ftpRequest.c_str());
 
-    cout << buffer << endl;
-
     bytes_left = ftpRequest.size()+1;
 
     sendDataToServer();
-
-    cout << "Request Sent\n";
-
-    cout << file_size << endl;
 
     file.seekg (0, std::ios::beg);
     buffer = new char[file_size];
@@ -88,15 +88,22 @@ int Request::send_file(){
     file.close();
 
     bytes_left = file_size;
-
-    cout << "File Read\n";
     
     sendDataToServer();
 
 
     delete[] temp;
 
-    cout << GREEN << "Successfully sent '" << filename << "' to Server.\n" << RESET;
+    char ack = recvAck();
+
+    if(ack == '0')
+        cout << GREEN << "Successfully sent '" << filename << "' to Server.\n" << RESET;
+    else if(ack == '1')
+        cout << RED << "Server Error " << filename << "upload failed!\n" << RESET;
+    else if(ack == '2')
+        cout << RED << "Upload Error in " << filename << " Server Connection abruptly closed!\n" << RESET;
+    else if(ack == '3')
+        cout << RED << "Upload Failed: Server failed to write " << filename << " on Disk!\n" << RESET;
     
     return 0;
 }
@@ -119,6 +126,16 @@ int Request::sendDataToServer(){
 
     // send(ACK)
     return 1;
+}
+
+char Request::recvAck(){
+    char *c;
+
+    if(recv(socket_desc, c, sizeof(c), 0) < 0){
+        cerr << RED << "Couldn't receive\n" << RESET;
+    }
+    
+    return *c;
 }
 
 

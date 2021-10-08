@@ -31,6 +31,8 @@ public:
     int get_file();
     int rename_file();
     int get_file_list();
+    char recvAck();
     int sendDataToServer();
     char* recvDataFromServer();
+    void print_help_message();
 };
