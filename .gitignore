@@ -3,6 +3,9 @@ output/
 main
 *.o
 CMakeLists.txt.user
+CPackConfig.cmake
+CPackSourceConfig.cmake
+DartConfiguration.tcl
 CMakeCache.txt
 CMakeFiles
 CMakeScripts
