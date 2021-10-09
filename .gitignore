@@ -4,6 +4,7 @@ main
 *.o
 CMakeLists.txt.user
 CPackConfig.cmake
+CPackSourceConfig.cmake
 CMakeCache.txt
 CMakeFiles
 CMakeScripts
