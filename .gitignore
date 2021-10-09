@@ -3,6 +3,7 @@ output/
 main
 *.o
 CMakeLists.txt.user
+CPackConfig.cmake
 CMakeCache.txt
 CMakeFiles
 CMakeScripts
