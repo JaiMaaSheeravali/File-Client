@@ -11,22 +11,18 @@
 using namespace std;
 
 int connect(){
-    int socket_desc;
-    
     // Create socket:
-    socket_desc = socket(AF_INET, SOCK_STREAM, 0);
+    int socket_desc = socket(AF_INET, SOCK_STREAM, 0);
     
     if(socket_desc < 0){
         cout << RED << "Unable to create socket\n" << RESET;
         return -1;
     }
     
-    cout << GREEN << "Socket created successfully\n" << RESET;
+    // cout << GREEN << "Socket created successfully\n" << RESET;
     
     
     //cout << GREEN << "Connected with server successfully\n" << RESET;
-    
-    Request request = Request(socket_desc);
 
     // Set port and IP the same as server-side:
     struct sockaddr_in server_addr;
@@ -41,9 +37,6 @@ int connect(){
         cout << RED << "Failed: Unable to connect to server\n" << RESET;
         return -1;
     }
-
-
-    request.handle_request();
     
-    return 0;
+    return socket_desc;
 }

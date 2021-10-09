@@ -5,6 +5,7 @@
 
 #include "../include/request.hpp"
 #include "../include/color.hpp"
+#include "../include/parse.hpp"
 
 using namespace std;
 
@@ -12,10 +13,12 @@ int Request::rename_file(){
     string original_filename, new_filename;
 
     cout << CYAN << "Enter current name of file: " << RESET;
-    cin >> original_filename;
+    getline(cin, original_filename);
+    trim(original_filename);
 
     cout << CYAN << "Enter updated name of file: " << RESET;
-    cin >> new_filename;
+    getline(cin, new_filename);
+    trim(new_filename);
 
     //send_data(original_filename.c_str(), original_filename.size());
     //send_data(new_filename.c_str(), new_filename.size());
@@ -56,7 +59,8 @@ int Request::delete_file(){
     string filename;
 
     cout << CYAN << "Enter filename to delete: " << RESET;
-    cin >> filename;
+    getline(cin, filename);
+    trim(filename);
 
     //send_data(filename.c_str(), filename.size());
 

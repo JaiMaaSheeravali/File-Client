@@ -10,6 +10,7 @@ class Request
 {
 private:
     int socket_desc;
+    char nack = '1';
     
     string login;
     string password;
@@ -35,4 +36,5 @@ public:
     int sendDataToServer();
     char* recvDataFromServer();
     void print_help_message();
+    void connectToServer();
 };

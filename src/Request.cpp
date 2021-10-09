@@ -8,6 +8,7 @@
 #include "../include/request.hpp"
 #include "../include/color.hpp"
 #include "../include/parse.hpp"
+#include "../include/socket.hpp"
 
 using namespace std;
 
@@ -20,9 +21,6 @@ Request::Request(int socket_id) {
 }
 
 void Request::handle_request(){
-    
-    
-    string command;
 
     // uncomment after proper implementation
     // while(true){
@@ -50,9 +48,10 @@ void Request::handle_request(){
     print_help_message();
 
     while(true){
+        string command;
         cout << CYAN << "Enter Command(enter 'help' for help dialog): " << RESET;
-        cin >> command;
-
+        getline(cin, command, '\n');
+        
         vector<string> tokens = ftp_tokenizer(command, ' ');
 
         // only shared repo works for now uncomment the code when private repo also starts working
@@ -63,6 +62,9 @@ void Request::handle_request(){
         //     isGlobal = false;
 
         ftpRequest = "login " + login + " " + password + "\n";
+
+        if(tokens.empty())
+            continue;
 
         if(tokens[0] == "upload"){
 
@@ -84,10 +86,11 @@ void Request::handle_request(){
             break;
         } else if(tokens[0] == "client"){
 
+            string client_command;
             cout << CYAN << "Enter Client Command: " << RESET;
-            cin >> command;
+            getline(cin, client_command);
 
-            system(command.c_str());
+            system(client_command.c_str());
             continue;
         } else if(tokens[0] == "help"){
 
@@ -95,8 +98,11 @@ void Request::handle_request(){
             continue;
         } else {
             cout << RED << "Invalid Command" << RESET << endl;
+            continue;
         }
-        break;
+
+        close(socket_desc);
+        connectToServer();
     }
 
     close(socket_desc);
@@ -114,4 +120,11 @@ void Request::print_help_message() {
     cout << "list, download, upload, rename, delete\n\n";
     cout << "e.g:- 'list' will list files in private repo and 'list -g' will list files in shared repo\n";
     cout << "\n" << RESET;
+}
+
+void Request::connectToServer(){
+    socket_desc = connect();
+    if(socket_desc == -1){
+        cerr << "Unable to Reconnect to server\n";
+    }
 }

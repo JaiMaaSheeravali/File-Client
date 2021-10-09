@@ -3,10 +3,12 @@
 #include <cstring>
 #include <string>
 #include <sys/socket.h>
+#include <arpa/inet.h>
 #include <unistd.h>
 
 #include "../include/request.hpp"
 #include "../include/color.hpp"
+#include "../include/parse.hpp"
 
 using namespace std;
 
@@ -14,7 +16,8 @@ int Request::get_file(){
     string filename;
 
     cout << CYAN << "Enter filename to fetch from server: " << RESET;
-    cin >> filename;
+    getline(cin, filename);
+    trim(filename);
     
     ftpRequest += "download ";
 
@@ -29,17 +32,24 @@ int Request::get_file(){
 
     strcpy(buffer, ftpRequest.c_str());
 
-    cout << buffer << endl;
-
     bytes_left = ftpRequest.size()+1;
 
     sendDataToServer();
+
+    char ack = recvAck();
+
+    if(ack == '1'){
+        cout << RED << "Internal Server Error: download failed!\n" << RESET;
+        return -1;
+    } else if(ack == '2'){
+        cout << RED << "Download Failed: file " << filename << " doesn't exist on server!\n" << RESET;
+        return -1;
+    }
 
     char *result = recvDataFromServer();
 
     ofstream file(filename, std::ios::out);
     file.write(result, strlen(result));
-
 
     cout << GREEN << "Successfully received '" << filename << "' from Server.\n" << RESET;
 
@@ -51,7 +61,8 @@ int Request::send_file(){
 
     // Get input from the user:
     cout << CYAN << "Enter filename to upload: " << RESET;
-    cin >> filename;
+    getline(cin, filename);
+    trim(filename);
 
     if(access(filename.c_str(), F_OK ) == -1){
         cout << RED << "Error! " << filename << " doesn't exist in current working directory!\n" << RESET;
@@ -81,29 +92,29 @@ int Request::send_file(){
 
     sendDataToServer();
 
+    char ack = recvAck();
+
+    if(ack == '2'){
+        cout << RED << "Upload failed: file " << filename << " already exits on server!\n" << RESET;
+        file.close();
+        return -1;
+    }
+
     file.seekg (0, std::ios::beg);
-    buffer = new char[file_size];
+    buffer = new char[file_size+1];
     char *temp = buffer;
     file.read(buffer, file_size);
     file.close();
 
     bytes_left = file_size;
+
     
     sendDataToServer();
 
+    // delete[] temp;
 
-    delete[] temp;
-
-    char ack = recvAck();
-
-    if(ack == '0')
-        cout << GREEN << "Successfully sent '" << filename << "' to Server.\n" << RESET;
-    else if(ack == '1')
-        cout << RED << "Server Error " << filename << "upload failed!\n" << RESET;
-    else if(ack == '2')
-        cout << RED << "Upload Error in " << filename << " Server Connection abruptly closed!\n" << RESET;
-    else if(ack == '3')
-        cout << RED << "Upload Failed: Server failed to write " << filename << " on Disk!\n" << RESET;
+    
+    cout << GREEN << "Successfully sent '" << filename << "' to Server.\n" << RESET;
     
     return 0;
 }
@@ -129,7 +140,7 @@ int Request::sendDataToServer(){
 }
 
 char Request::recvAck(){
-    char *c;
+    char *c = &nack;
 
     if(recv(socket_desc, c, sizeof(c), 0) < 0){
         cerr << RED << "Couldn't receive\n" << RESET;
@@ -141,14 +152,16 @@ char Request::recvAck(){
 
 char* Request::recvDataFromServer(){
     int file_size = 0;
+    int tmp = 0;
 
-    if (recv(socket_desc, &file_size, sizeof(int), 0) < 0){
+    if (recv(socket_desc, &tmp, sizeof(int), 0) < 0){
         cerr << RED << "Couldn't receive\n" << RESET;
     }
-    //file_size = ntohl(file_size);
-    cout << "File Size " << file_size << endl;
 
-    char *buffer = new char[file_size];
+    file_size = ntohl(tmp);
+
+    char *buffer = new char[file_size+1];
+    buffer[file_size] = '\0';
     char *result = buffer;
     bytes_left = file_size;
     bytes_sent = 0;
@@ -158,7 +171,7 @@ char* Request::recvDataFromServer(){
         // perform non blocking io on the socket file descriptor
         if (((bytes_sent = recv(socket_desc, buffer, bytes_left, 0)) == -1))
         {
-            cerr << "failed data transfer";
+            cerr << "Failed data transfer";
             // send(NACK)
             return result;
         }
