@@ -11,7 +11,7 @@ class Request
 private:
     int socket_desc;
     
-    string login;
+    string username;
     string password;
     string ftpRequest;
     string transferEndFlag;
@@ -30,6 +30,8 @@ public:
     int delete_file();
     int get_file();
     int rename_file();
+    int login_user();
+    int register_user();
     int get_file_list();
     int sendDataToServer();
     char* recvDataFromServer();

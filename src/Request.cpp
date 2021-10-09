@@ -13,7 +13,7 @@ using namespace std;
 
 Request::Request(int socket_id) {
     socket_desc = socket_id;
-    login = "testuser";
+    username = "testuser";
     password = "Pa$$w0rd";
     isGlobal = true;
     transferEndFlag = "done\n";
@@ -32,13 +32,17 @@ void Request::handle_request(){
         trim(command);
 
         if(command == "login"){
-            // get login information and check it
+            // login the user and get the information
+            if(login_user()){
+                cout << "Succesful login" << endl;
+                // break;
+            }
 
-            //break;
+            
         } else if(command == "register"){
             // register the user and get information
-
-            //break;
+            register_user();
+            // break;
         } else if(command == "exit"){
             return;
 
@@ -59,7 +63,7 @@ void Request::handle_request(){
         // else
         //     isGlobal = false;
 
-        ftpRequest = "login " + login + " " + password + "\n";
+        ftpRequest = "login " + username + " " + password + "\n";
 
         if(tokens[0] == "upload"){
 
