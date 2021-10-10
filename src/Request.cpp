@@ -14,8 +14,8 @@ using namespace std;
 
 Request::Request(int socket_id) {
     socket_desc = socket_id;
-    username = "testuser";
-    password = "Pa$$w0rd";
+    username = "";
+    password = "";
     isGlobal = true;
     transferEndFlag = "done\n";
 }
@@ -24,28 +24,32 @@ void Request::handle_request(){
 
     // uncomment after proper implementation
     while(true){
+        string command;
         cout << CYAN << "Enter Command(login | register | exit): " << RESET;
-        cin >> command;
+        getline(cin, command);
 
         trim(command);
 
         if(command == "login"){
             // login the user and get the information
-            if(login_user()){
-                cout << "Succesful login" << endl;
+            if(login_user())
                 break;
-            }
-
             
         } else if(command == "register"){
             // register the user and get information
-            register_user();
-            // break;
+            if(register_user())
+                break;
+
         } else if(command == "exit"){
+            close(socket_desc);
             return;
+            
         } else {
              cout << RED << "Invalid Input!.\n" << RESET;
+             continue;
         }
+        close(socket_desc);
+        connectToServer();
     }
     
     print_help_message();
@@ -59,10 +63,10 @@ void Request::handle_request(){
 
         // only shared repo works for now uncomment the code when private repo also starts working
 
-        // if(tokens.size() > 1 && tokens[1] == "-g")
-        //     isGlobal = true;
-        // else
-        //     isGlobal = false;
+        if(tokens.size() > 1 && tokens[1] == "-g")
+            isGlobal = true;
+        else
+            isGlobal = false;
 
         ftpRequest = "login " + username + " " + password + "\n";
 

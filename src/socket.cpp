@@ -19,10 +19,6 @@ int connect(){
         return -1;
     }
     
-    // cout << GREEN << "Socket created successfully\n" << RESET;
-    
-    
-    //cout << GREEN << "Connected with server successfully\n" << RESET;
 
     // Set port and IP the same as server-side:
     struct sockaddr_in server_addr;
