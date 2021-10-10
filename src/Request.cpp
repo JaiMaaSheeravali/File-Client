@@ -2,6 +2,7 @@
 #include <string>
 #include <cstring>
 #include <unistd.h>
+#include <algorithm>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
@@ -51,6 +52,7 @@ void Request::handle_request(){
         string command;
         cout << CYAN << "Enter Command(enter 'help' for help dialog): " << RESET;
         getline(cin, command, '\n');
+        transform(command.begin(), command.end(), command.begin(), ::tolower);
         
         vector<string> tokens = ftp_tokenizer(command, ' ');
 
