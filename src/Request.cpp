@@ -8,6 +8,7 @@
 #include "../include/request.hpp"
 #include "../include/color.hpp"
 #include "../include/parse.hpp"
+#include "../include/socket.hpp"
 
 using namespace std;
 
@@ -20,12 +21,9 @@ Request::Request(int socket_id) {
 }
 
 void Request::handle_request(){
-    
-    
-    string command;
 
     // uncomment after proper implementation
-    // while(true){
+    while(true){
         cout << CYAN << "Enter Command(login | register | exit): " << RESET;
         cin >> command;
 
@@ -35,7 +33,7 @@ void Request::handle_request(){
             // login the user and get the information
             if(login_user()){
                 cout << "Succesful login" << endl;
-                // break;
+                break;
             }
 
             
@@ -45,18 +43,21 @@ void Request::handle_request(){
             // break;
         } else if(command == "exit"){
             return;
-
         } else {
-            cout << RED << "Invalid Input!.\n" << RESET;
+             cout << RED << "Invalid Input!.\n" << RESET;
         }
-    // }
+    }
     
+    print_help_message();
 
     while(true){
-        cout << CYAN << "Enter Command(upload | download | list | delete | rename | exit)(optional -g): " << RESET;
-        cin >> command;
-
+        string command;
+        cout << CYAN << "Enter Command(enter 'help' for help dialog): " << RESET;
+        getline(cin, command, '\n');
+        
         vector<string> tokens = ftp_tokenizer(command, ' ');
+
+        // only shared repo works for now uncomment the code when private repo also starts working
 
         // if(tokens.size() > 1 && tokens[1] == "-g")
         //     isGlobal = true;
@@ -64,6 +65,9 @@ void Request::handle_request(){
         //     isGlobal = false;
 
         ftpRequest = "login " + username + " " + password + "\n";
+
+        if(tokens.empty())
+            continue;
 
         if(tokens[0] == "upload"){
 
@@ -83,12 +87,47 @@ void Request::handle_request(){
         } else if(tokens[0] == "exit"){
             
             break;
+        } else if(tokens[0] == "client"){
+
+            string client_command;
+            cout << CYAN << "Enter Client Command: " << RESET;
+            getline(cin, client_command);
+
+            system(client_command.c_str());
+            continue;
+        } else if(tokens[0] == "help"){
+
+            print_help_message();
+            continue;
         } else {
             cout << RED << "Invalid Command" << RESET << endl;
+            continue;
         }
-        break;
+
+        close(socket_desc);
+        connectToServer();
     }
 
     close(socket_desc);
     return;
+}
+
+void Request::print_help_message() {
+    cout << YELLOW;
+    cout << "Following commands are supported by the server:\n";
+    cout << "client: Can be used to run a command locally without exiting\n";
+    cout << "exit: Used to exit the client\n";
+    cout << "help: displays this help dialog\n";
+    cout << "\n";
+    cout << "Following commands also support optional -g flag to access shared repo on Server:\n";
+    cout << "list, download, upload, rename, delete\n\n";
+    cout << "e.g:- 'list' will list files in private repo and 'list -g' will list files in shared repo\n";
+    cout << "\n" << RESET;
+}
+
+void Request::connectToServer(){
+    socket_desc = connect();
+    if(socket_desc == -1){
+        cerr << "Unable to Reconnect to server\n";
+    }
 }
