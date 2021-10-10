@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <algorithm>
 
 #include "../include/request.hpp"
 #include "../include/color.hpp"
@@ -27,6 +28,7 @@ void Request::handle_request(){
         string command;
         cout << CYAN << "Enter Command(login | register | exit): " << RESET;
         getline(cin, command);
+        transform(command.begin(), command.end(), command.begin(), ::tolower);
 
         trim(command);
 
@@ -58,6 +60,7 @@ void Request::handle_request(){
         string command;
         cout << CYAN << "Enter Command(enter 'help' for help dialog): " << RESET;
         getline(cin, command, '\n');
+        transform(command.begin(), command.end(), command.begin(), ::tolower);
         
         vector<string> tokens = ftp_tokenizer(command, ' ');
 
