@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <algorithm>
 
 #include "../include/request.hpp"
 #include "../include/color.hpp"
@@ -15,8 +16,8 @@ using namespace std;
 
 Request::Request(int socket_id) {
     socket_desc = socket_id;
-    login = "testuser";
-    password = "Pa$$w0rd";
+    username = "";
+    password = "";
     isGlobal = true;
     transferEndFlag = "done\n";
 }
@@ -24,27 +25,35 @@ Request::Request(int socket_id) {
 void Request::handle_request(){
 
     // uncomment after proper implementation
-    // while(true){
-        // cout << CYAN << "Enter Command(login | register | exit): " << RESET;
-        // cin >> command;
+    while(true){
+        string command;
+        cout << CYAN << "Enter Command(login | register | exit): " << RESET;
+        getline(cin, command);
+        transform(command.begin(), command.end(), command.begin(), ::tolower);
 
-        // trim(command);
+        trim(command);
 
-        // if(command == "login"){
-        //     // get login information and check it
+        if(command == "login"){
+            // login the user and get the information
+            if(login_user())
+                break;
+            
+        } else if(command == "register"){
+            // register the user and get information
+            if(register_user())
+                break;
 
-        //     //break;
-        // } else if(command == "register"){
-        //     // register the user and get information
-
-        //     //break;
-        // } else if(command == "exit"){
-        //     return;
-
-        // } else {
-        //     cout << RED << "Invalid Input!.\n" << RESET;
-        // }
-    // }
+        } else if(command == "exit"){
+            close(socket_desc);
+            return;
+            
+        } else {
+             cout << RED << "Invalid Input!.\n" << RESET;
+             continue;
+        }
+        close(socket_desc);
+        connectToServer();
+    }
     
     print_help_message();
 
@@ -58,12 +67,12 @@ void Request::handle_request(){
 
         // only shared repo works for now uncomment the code when private repo also starts working
 
-        // if(tokens.size() > 1 && tokens[1] == "-g")
-        //     isGlobal = true;
-        // else
-        //     isGlobal = false;
+        if(tokens.size() > 1 && tokens[1] == "-g")
+            isGlobal = true;
+        else
+            isGlobal = false;
 
-        ftpRequest = "login " + login + " " + password + "\n";
+        ftpRequest = "login " + username + " " + password + "\n";
 
         if(tokens.empty())
             continue;
